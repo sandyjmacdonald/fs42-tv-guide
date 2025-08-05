@@ -2,6 +2,15 @@
 
 A newspaper-style TV guide application that fetches schedule data and enriches it with TMDb movie/TV information.
 
+It features: 
+
+* an authentic-looking newspaper TV guide styling
+* certificate ratings, star ratings, and screengrabs for movies
+* highlighting of the current time slot and shows
+* the ability to click channel names to change channel
+
+![Full-page screenshot of FS42 TV guide](screenshots/screenshot-1.png)
+
 ## Installation
 
 ### 1. Update Your Raspberry Pi
@@ -138,6 +147,8 @@ chmod 644 .env
 ```
 
 ## Running the Application
+
+![Cropped-in screenshot of FS42 TV guide](screenshots/screenshot-2.png)
 
 ### Manual Start
 ```bash
