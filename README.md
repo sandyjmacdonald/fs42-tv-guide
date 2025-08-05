@@ -78,7 +78,58 @@ IGNORE_CHANS=Shopping Channel,Infomercials,Test Channel
 - Replace `http://your-fs42-server:port` with your actual FS42 TV guide API endpoint
 - This should be the base URL of your TV schedule data source
 
-### 3. File Permissions
+### 3. Program Title Naming Requirements
+
+For the application to properly detect and enrich movies and TV shows with TMDb data, your schedule data must follow specific naming patterns:
+
+#### TV Shows/Episodes
+TV episodes must be formatted as:
+```
+Series Name - S##E##
+```
+or
+```
+Series Name – S##E##
+```
+
+**Examples:**
+- `Breaking Bad - S01E01`
+- `The Office – S03E12`
+- `Game of Thrones - S08E06`
+
+**Notes:**
+- Use either a hyphen (`-`) as the separator
+- Season and episode numbers should 2 digits
+- The application will extract series name, season, and episode numbers
+- Multi-part episodes like `S01E01-E02` are supported
+
+#### Movies
+Movies must include the release year in parentheses:
+```
+Movie Title (YYYY)
+```
+
+**Examples:**
+- `The Shawshank Redemption (1994)`
+- `Inception (2010)`
+- `Top Gun: Maverick (2022)`
+
+**Notes:**
+- The year must be exactly 4 digits in parentheses at the end
+- The application will extract movie title and year for TMDb lookup
+- Movies will display star ratings and additional metadata
+
+#### Special Programming
+Programs that don't match these patterns will be treated as generic programming:
+- Live events, news, sports
+- Specials without standard episode formatting
+- Local programming
+
+**Off-Air Detection:**
+- Programs titled exactly `offair` (case-insensitive) will be styled as off-air blocks
+- Consecutive off-air blocks will be automatically merged
+
+### 4. File Permissions
 Ensure the application has proper permissions:
 
 ```bash
