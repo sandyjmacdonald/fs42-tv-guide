@@ -1,0 +1,20 @@
+{
+  "name": "tv-guide",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "lru-cache": "^11.1.0",
+    "node-fetch": "^3.3.2",
+    "p-map": "^7.0.3"
+  }
+}
