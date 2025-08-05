@@ -1,6 +1,6 @@
 # FS42 TV Guide
 
-A newspaper-style TV guide application that fetches FieldStation42 schedule data (for the current day only) and enriches it with TMDb movie/TV information and lots of other bells and whistles.
+A newspaper-style TV guide Preact app. that fetches FieldStation42 schedule data (for the current day only) and enriches it with TMDb movie/TV information and lots of other bells and whistles.
 
 Built to work with the terrfic [FieldStation42 project](https://github.com/shane-mason/FieldStation42) by Shane Mason.
 
