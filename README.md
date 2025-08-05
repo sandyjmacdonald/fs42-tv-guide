@@ -11,6 +11,7 @@ It features:
 * highlighting of the current time slot and shows
 * the ability to click channel names to change channel
 
+</br>
 
 ![Full-page screenshot of FS42 TV guide](screenshots/screenshot-1.png)
 
