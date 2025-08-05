@@ -68,6 +68,8 @@ Add the following variables to your `.env` file:
 
 ```env
 # FS42 TV API Configuration
+# Use http://127.0.0.1:4242 if running on same machine as 
+# FieldStation42
 FS42_API_URL=http://your-fs42-server:port
 
 # TMDb API Configuration  
