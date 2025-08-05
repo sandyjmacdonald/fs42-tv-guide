@@ -96,8 +96,8 @@ IGNORE_CHANS=Shopping Channel,Infomercials,Test Channel
 
 (_NOTE: for some reason it is necessary to use 127.0.0.1 rather than localhost if running on the same machine_)
 
-### 3. Program Title Naming Requirements
-For the app to properly detect and enrich movies and TV shows with TMDb data, your TV show/movie files must follow specific naming patterns:
+### 3. Program Title Naming Conventions
+For the app to properly detect and enrich movies and TV shows with TMDb data, your TV show/movie files must follow specific naming conventions:
 
 #### TV Shows/Episodes
 TV episodes must be formatted as:
