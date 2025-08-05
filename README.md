@@ -2,6 +2,8 @@
 
 A newspaper-style TV guide application that fetches schedule data and enriches it with TMDb movie/TV information.
 
+![Cropped-in screenshot of FS42 TV guide](screenshots/screenshot-2.png)
+
 It features: 
 
 * an authentic-looking newspaper TV guide styling
@@ -147,8 +149,6 @@ chmod 644 .env
 ```
 
 ## Running the Application
-
-![Cropped-in screenshot of FS42 TV guide](screenshots/screenshot-2.png)
 
 ### Manual Start
 ```bash
