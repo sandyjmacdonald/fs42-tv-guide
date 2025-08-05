@@ -1,6 +1,6 @@
 # FS42 TV Guide
 
-A newspaper-style TV guide Preact app. that fetches FieldStation42 schedule data (for the current day only) and enriches it with TMDb movie/TV information and lots of other bells and whistles.
+A newspaper-style TV guide Preact app that fetches FieldStation42 schedule data (for the current day only) and enriches it with TMDb movie/TV information and lots of other bells and whistles.
 
 Built to work with the terrific [FieldStation42 project](https://github.com/shane-mason/FieldStation42) by Shane Mason.
 
@@ -8,10 +8,10 @@ Built to work with the terrific [FieldStation42 project](https://github.com/shan
 
 It features: 
 
-* an authentic-looking newspaper TV guide styling
-* certificate ratings, star ratings, and screengrabs for movies
-* highlighting of the current time slot and shows
-* the ability to click channel names to change channel
+- An authentic-looking newspaper TV guide styling
+- Certificate ratings, star ratings, and screengrabs for movies
+- Highlighting of the current time slot and current shows
+- The ability to click channel names to change to that channel
 
 </br>
 
@@ -92,21 +92,18 @@ IGNORE_CHANS=Shopping Channel,Infomercials,Test Channel
 5. Copy your API key to the `TMDB_KEY` variable
 
 #### FS42 API URL:
-- Replace `http://your-fs42-server:port` with your actual FS42 TV guide API endpoint
-- This should be the base URL of your TV schedule data source
+- Replace `http://your-fs42-server:port` with your actual FieldStation42 web API endpoint
+
+(_NOTE: for some reason it is necessary to use 127.0.0.1 rather than localhost if running on the same machine_)
 
 ### 3. Program Title Naming Requirements
-
-For the application to properly detect and enrich movies and TV shows with TMDb data, your schedule data must follow specific naming patterns:
+For the app to properly detect and enrich movies and TV shows with TMDb data, your TV show/movie files must follow specific naming patterns:
 
 #### TV Shows/Episodes
 TV episodes must be formatted as:
+
 ```
 Series Name - S##E##
-```
-or
-```
-Series Name – S##E##
 ```
 
 **Examples:**
@@ -115,13 +112,16 @@ Series Name – S##E##
 - `Game of Thrones - S08E06`
 
 **Notes:**
-- Use either a hyphen (`-`) as the separator
+
+- Use a hyphen (`-`) as the separator
 - Season and episode numbers should 2 digits
 - The application will extract series name, season, and episode numbers
 - Multi-part episodes like `S01E01-E02` are supported
 
 #### Movies
+
 Movies must include the release year in parentheses:
+
 ```
 Movie Title (YYYY)
 ```
@@ -143,11 +143,11 @@ Programs that don't match these patterns will be treated as generic programming:
 - Local programming
 
 **Off-Air Detection:**
-- Programs titled exactly `offair` (case-insensitive) will be styled as off-air blocks
+- Programs titled `offair` (FieldStation42 will call off-air time this, case-insensitive) will be styled as off-air blocks
 - Consecutive off-air blocks will be automatically merged
 
 ### 4. File Permissions
-Ensure the application has proper permissions:
+Ensure the app has proper permissions:
 
 ```bash
 chmod +x server.js
@@ -162,7 +162,7 @@ chmod 644 .env
 node server.js
 ```
 
-The application will be available at:
+The app will be available at:
 - Local access: `http://localhost:3000`
 - Network access: `http://[raspberry-pi-ip]:3000`
 
