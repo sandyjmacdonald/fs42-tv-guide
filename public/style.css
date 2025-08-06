@@ -116,6 +116,10 @@ body::after {
   background-blend-mode: multiply, screen;
   opacity: 0.95;
   z-index: 21;
+  /* workaround for iOS Safari multi-background optimization */
+  background-attachment: scroll;
+  -webkit-transform: translateZ(0);
+  will-change: background-image, opacity;
 }
 
 .header::after {
