@@ -429,11 +429,8 @@ body::after {
 
 /* ————— compact mode overrides ————— */
 body.compact .guide-container {
-  /* shrink each time-slot row to compact height */
   grid-template-rows: var(--channel-header-height) repeat(290, var(--compact-row-height));
-  /* narrow each channel column to compact scale */
   grid-template-columns: 4em repeat(var(--chan-count), calc(var(--chan-width) * var(--compact-col-scale)));
-  /* shrink container width to match compact columns */
   width: calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale)));
   padding-bottom: 1.25rem;
 }
@@ -446,13 +443,12 @@ body.compact .program .summary,
 body.compact .program .movie-extras,
 body.compact .program .star-wrapper,
 body.compact .summary-image {
-  /* hide extras in compact mode */
   display: none !important;
 }
 
 body.compact .program {
-  /* tighten program padding now that summaries are gone */
   padding: 0.25rem 0.65rem 0.25rem 0.5rem;
+  border-bottom: 1px solid rgb(197, 195, 195);
 }
 
 /* ————— compact mode half-hour hiding ————— */
@@ -460,7 +456,6 @@ body.compact .time-label:nth-of-type(odd) {
   display: none !important;
 }
 
-/* override background overlay width in compact mode */
 body.compact::before,
 body.compact::after {
   width: calc(4em + var(--chan-count) * calc(var(--chan-width) * 0.8)) !important;
