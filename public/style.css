@@ -90,7 +90,7 @@ body::after {
   font-size: var(--font-size-header);
   font-weight: bold;
   letter-spacing: 0.05em;
-  width: calc(2rem + var(--chan-count) * var(--chan-width));
+  width: calc(4rem + var(--chan-count) * var(--chan-width));
   height: 5rem;
   box-sizing: border-box;
   position: fixed;
