@@ -5,7 +5,11 @@
 /* style.css */
 
 :root {
+  --header-height: 5rem;
+  --channel-header-height: 3rem;
   --chan-width: 12.5rem;
+  --compact-row-height: 0.4rem;
+  --compact-col-scale: 0.8;
 
   /* fonts */
   --font-family-base: 'Roboto Condensed', sans-serif;
@@ -91,7 +95,7 @@ body::after {
   font-weight: bold;
   letter-spacing: 0.05em;
   width: 100%;
-  height: 5rem;
+  height: var(--header-height);
   box-sizing: border-box;
   position: fixed;
   top: 0;
@@ -141,9 +145,9 @@ body::after {
 .guide-container {
   display: grid;
   grid-template-columns: 4em repeat(var(--chan-count), var(--chan-width));
-  grid-template-rows: 2.5rem repeat(290, 1rem);
+  grid-template-rows: var(--channel-header-height) repeat(290, 1rem);
   width: calc(4em + var(--chan-count) * var(--chan-width));
-  margin: 73px auto 10px;
+  margin: var(--header-height) auto 10px;
   box-sizing: border-box;
   border-bottom: 1px solid var(--color-border);
   background: transparent;
@@ -187,7 +191,8 @@ body::after {
   grid-column: 1;
   background: var(--color-white);
   position: sticky;
-  top: 73px;
+  height: var(--channel-header-height);
+  top: var(--header-height);
   left: 0;
   z-index: 20;
 }
@@ -195,7 +200,7 @@ body::after {
 /* ————— channel headers ————— */
 .channel-header {
   grid-row: 1;
-  padding: 0 0.3rem;
+  padding: 0 0.75rem;
   background: var(--color-white);
   color: var(--color-text);
   text-transform: uppercase;
@@ -205,10 +210,11 @@ body::after {
   font-size: var(--font-size-channel-header);
   font-weight: bold;
   position: sticky;
-  top: 73px;
+  top: var(--header-height);
   z-index: 10;
   box-sizing: border-box;
   cursor: pointer;
+  height: var(--channel-header-height);
 }
 
 .channel-num {
@@ -226,7 +232,7 @@ body::after {
   align-items: center;
   background: var(--color-white);
   position: sticky;
-  top: 73px;
+  top: var(--header-height);
   left: 0;
   z-index: 5;
 }
@@ -421,10 +427,17 @@ body::after {
 
 /* ————— compact mode overrides ————— */
 body.compact .guide-container {
-  /* shrink each time-slot row to one-third height */
-  grid-template-rows: 2.5rem repeat(290, 0.5rem);
-  /* narrow each channel column to half its normal width */
-  grid-template-columns: 4em repeat(var(--chan-count), calc(var(--chan-width) * 0.4));
+  /* shrink each time-slot row to compact height */
+  grid-template-rows: var(--channel-header-height) repeat(290, var(--compact-row-height));
+  /* narrow each channel column to compact scale */
+  grid-template-columns: 4em repeat(var(--chan-count), calc(var(--chan-width) * var(--compact-col-scale)));
+  /* shrink container width to match compact columns */
+  width: calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale)));
+  padding-bottom: 1.25rem;
+}
+
+body.compact .guide-container::before {
+  height: calc(287 * var(--compact-row-height));
 }
 
 body.compact .program .summary,
@@ -443,4 +456,10 @@ body.compact .program {
 /* ————— compact mode half-hour hiding ————— */
 body.compact .time-label:nth-of-type(odd) {
   display: none !important;
+}
+
+/* override background overlay width in compact mode */
+body.compact::before,
+body.compact::after {
+  width: calc(4em + var(--chan-count) * calc(var(--chan-width) * 0.8)) !important;
 }
