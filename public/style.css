@@ -311,6 +311,7 @@ body::after {
   font-size: var(--font-size-day);
   color: var(--color-off-white);
   padding-top: 0.7rem;
+  padding-left: 0.7rem;
   position: relative;
   z-index: 22;
 }
