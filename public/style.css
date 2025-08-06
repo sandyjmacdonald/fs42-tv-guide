@@ -1,6 +1,8 @@
 /* Ensure grid-wrap is positioned for absolute children */
 #grid-wrap {
   position: relative;
+  overscroll-behavior-x: contain;
+  touch-action: pan-y;  
 }
 /* style.css */
 
