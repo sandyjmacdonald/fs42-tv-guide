@@ -418,3 +418,29 @@ body::after {
   pointer-events: none;
   z-index: 25;
 }
+
+/* ————— compact mode overrides ————— */
+body.compact .guide-container {
+  /* shrink each time-slot row to one-third height */
+  grid-template-rows: 2.5rem repeat(290, 0.5rem);
+  /* narrow each channel column to half its normal width */
+  grid-template-columns: 4em repeat(var(--chan-count), calc(var(--chan-width) * 0.4));
+}
+
+body.compact .program .summary,
+body.compact .program .movie-extras,
+body.compact .program .star-wrapper,
+body.compact .summary-image {
+  /* hide extras in compact mode */
+  display: none !important;
+}
+
+body.compact .program {
+  /* tighten program padding now that summaries are gone */
+  padding: 0.25rem 0.65rem 0.25rem 0.5rem;
+}
+
+/* ————— compact mode half-hour hiding ————— */
+body.compact .time-label:nth-of-type(odd) {
+  display: none !important;
+}

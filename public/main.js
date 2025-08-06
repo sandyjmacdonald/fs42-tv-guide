@@ -4,6 +4,12 @@ import { useState, useEffect } from 'https://esm.sh/preact@10/hooks';
 import htm from 'https://esm.sh/htm@3';
 const html = htm.bind(h);
 
+// enable compact mode via URL parameter
+const params = new URLSearchParams(window.location.search);
+if (params.get('mode') === 'compact') {
+  document.body.classList.add('compact');
+}
+
 // number of milliseconds in one minute
 const MS_PER_MINUTE = 60 * 1000;
 
@@ -141,12 +147,19 @@ function App() {
     if (labels.length === 0) return;
     const updateCurrent = () => {
       const now = Date.now();
-      const minutesSinceStart = (now - start) / MS_PER_MINUTE;
-      // Determine which half-hour block we're in
-      const blockNumber = Math.floor(minutesSinceStart / 30);
-      // Convert to the 5-minute slot index that matches labels[].idx
-      const labelIdx = blockNumber * (30 / slotMin); // e.g. 6 slots per half-hour
-      setCurrentLabelIdx(labelIdx);
+      const isCompactMode = document.body.classList.contains('compact');
+      if (isCompactMode) {
+        // highlight the current hour label
+        const nowDt = new Date(now);
+        const hourTxt = nowDt.toTimeString().slice(0,5).replace(/:\d{2}$/, ':00');
+        const match = labels.find(l => l.txt === hourTxt);
+        setCurrentLabelIdx(match ? match.idx : null);
+      } else {
+        const minutesSinceStart = (now - start) / MS_PER_MINUTE;
+        const blockNumber = Math.floor(minutesSinceStart / 30);
+        const labelIdx = blockNumber * (30 / slotMin);
+        setCurrentLabelIdx(labelIdx);
+      }
     };
     updateCurrent(); // initial highlight
     const iv = setInterval(updateCurrent, MS_PER_MINUTE);
@@ -191,11 +204,17 @@ function App() {
         })}
 
         <!-- time labels -->
-        ${labels.map(({idx,txt}) => html`
-          <div class="time-label${currentLabelIdx === idx ? ' current' : ''}" style="grid-row:${idx+2};">
-            ${txt}
-          </div>
-        `)}
+        ${labels.map(({idx, txt}) => {
+          const minutes = parseInt(txt.split(':')[1], 10);
+          const isCompactMode = document.body.classList.contains('compact');
+          const isVisibleSlot = !isCompactMode || minutes === 0;
+          const isCurrentVisible = currentLabelIdx === idx && isVisibleSlot;
+          return html`
+            <div class="time-label${isCurrentVisible ? ' current' : ''}" style="grid-row:${idx+2};">
+              ${txt}
+            </div>
+          `;
+        })}
 
         <!-- program blocks -->
         ${channels.flatMap((c,ci) =>
