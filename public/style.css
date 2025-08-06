@@ -9,6 +9,7 @@
 
   /* fonts */
   --font-family-base: 'Roboto Condensed', sans-serif;
+  --font-family-date: 'Roboto', sans-serif;
   --font-size-base: 1rem;
   --font-size-header: 1.5rem;
   --font-size-channel-header: 1.1rem;
@@ -306,15 +307,19 @@ body::after {
 
 /* ————— header date/day ————— */
 .hdr-day {
+  font-family: var(--font-family-date);
   font-size: var(--font-size-day);
   color: var(--color-off-white);
+  padding-top: 0.7rem;
   position: relative;
   z-index: 22;
 }
 .hdr-date {
+  font-family: var(--font-family-date);
   font-size: var(--font-size-date);
   padding-left: 10px;
   color: var(--color-grey);
+  padding-top: 0.7rem;
   position: relative;
   z-index: 22;
 }
