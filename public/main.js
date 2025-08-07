@@ -227,7 +227,7 @@ function App() {
             const raw  = b.title.trim();
             const isMovie = MOVIE_YR_RX.test(raw);
             const isOff   = OFFAIR_RX.test(raw);
-            const charLimit = Math.floor(span*totalMin/60);
+            const charLimit = Math.floor(span*totalMin/70);
             const disp = raw.replace(TV_EP_RX,'').trim();
 
             // extract episode and series info for link
@@ -358,9 +358,13 @@ function Summary({ title, limit, href, starRating, currentProg, highlighterUrl, 
   const disp = showDescription ? (full.length > limit ? full.slice(0,limit)+'…' : full) : null;
 
   // build display title and year match for title node
-  const dispTitle = title.replace(TV_EP_RX, '').trim().replace(/\s*\(\d{4}\)$/, '').trim();
-  const yearMatch = title.match(/\((\d{4})\)$/);
   const isMovie = MOVIE_YR_RX.test(title);
+  const dispTitle = (isMovie ? 'MOVIE: ' : '') + title
+    .replace(TV_EP_RX, '')
+    .trim()
+    .replace(/\s*\(\d{4}\)$/, '')
+    .trim();
+  const yearMatch = title.match(/\((\d{4})\)$/);
 
   let stars = null;
   if (isMovie && starRating != null) {
