@@ -64,7 +64,8 @@ body::after {
   position: absolute;
   top:    0;
   left:   0;
-  width:  calc(4em + var(--chan-count) * var(--chan-width));
+  /* full-page width for halftone/paper backgrounds */
+  width: max(100%, calc(4em + var(--chan-count) * var(--chan-width)));
   height: 100%;
   pointer-events: none;
 }
@@ -146,9 +147,8 @@ body::after {
 /* ————— guide grid ————— */
 .guide-container {
   display: grid;
-  grid-template-columns: 4em repeat(var(--chan-count), var(--chan-width));
+  grid-template-columns: 4em repeat(var(--chan-count), minmax(var(--chan-width), 1fr));
   grid-template-rows: var(--channel-header-height) repeat(290, 1rem);
-  width: calc(4em + var(--chan-count) * var(--chan-width));
   margin: var(--header-height) auto 10px;
   box-sizing: border-box;
   border-bottom: 1px solid var(--color-border);
@@ -163,7 +163,7 @@ body::after {
   position: absolute;
   top:    0;
   left:   0;
-  right:  0;
+  width: max(100%, calc(4em + var(--chan-count) * var(--chan-width)));
   bottom: 0;
   background: var(--texture-newspaper) repeat top left;
   background-size: 40% 40%;
@@ -430,8 +430,7 @@ body::after {
 /* ————— compact mode overrides ————— */
 body.compact .guide-container {
   grid-template-rows: var(--channel-header-height) repeat(290, var(--compact-row-height));
-  grid-template-columns: 4em repeat(var(--chan-count), calc(var(--chan-width) * var(--compact-col-scale)));
-  width: calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale)));
+  grid-template-columns: 4em repeat(var(--chan-count), minmax(calc(var(--chan-width) * var(--compact-col-scale)), 1fr));
   padding-bottom: 1.25rem;
 }
 
@@ -456,13 +455,27 @@ body.compact .time-label:nth-of-type(odd) {
   display: none !important;
 }
 
-body.compact::before,
+/* keep paper texture narrow in compact mode */
+body.compact::before {
+  width: calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale))) !important;
+}
+/* let halftone span full page in compact mode */
 body.compact::after {
-  width: calc(4em + var(--chan-count) * calc(var(--chan-width) * 0.8)) !important;
+  width: max(100%, calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale)))) !important;
+}
+
+/* keep newspaper overlay spanning full grid in compact mode */
+body.compact .guide-container::after {
+  width: max(100%, calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale)))) !important;
 }
 
 /* prevent accidental back/forward swipe during horizontal scroll */
 #grid-wrap {
   overscroll-behavior-x: contain;
   touch-action: pan-y;
+}
+/* use fixed rem widths when channels exceed viewport */
+body.fixed-cols .guide-container {
+  grid-template-columns: 4em repeat(var(--chan-count), var(--chan-width)) !important;
+  width: calc(4em + var(--chan-count) * var(--chan-width)) !important;
 }

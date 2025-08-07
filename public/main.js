@@ -10,6 +10,23 @@ if (params.get('mode') === 'compact') {
   document.body.classList.add('compact');
 }
 
+// toggle fixed column widths when viewport is narrower than content
+function updateFixedColumns() {
+  const chanCount = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--chan-count'), 10);
+  const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  const chanWidthRem = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chan-width'));
+  const minTotalPx = (4 + chanCount * chanWidthRem) * rootFontSize;
+  if (window.innerWidth < minTotalPx) {
+    document.body.classList.add('fixed-cols');
+  } else {
+    document.body.classList.remove('fixed-cols');
+  }
+}
+window.addEventListener('load', updateFixedColumns);
+window.addEventListener('resize', updateFixedColumns);
+// run once on script load to set initial fixed-cols state
+updateFixedColumns();
+
 // number of milliseconds in one minute
 const MS_PER_MINUTE = 60 * 1000;
 
@@ -172,6 +189,7 @@ function App() {
 
   // set channel count var and compute CSS grid columns
   document.documentElement.style.setProperty('--chan-count', channels.length);
+  updateFixedColumns();
   const cols = ['4em', ...channels.map(()=> '1fr')].join(' ');
 
   return html`
