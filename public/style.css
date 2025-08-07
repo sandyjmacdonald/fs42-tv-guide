@@ -460,3 +460,9 @@ body.compact::before,
 body.compact::after {
   width: calc(4em + var(--chan-count) * calc(var(--chan-width) * 0.8)) !important;
 }
+
+/* prevent accidental back/forward swipe during horizontal scroll */
+#grid-wrap {
+  overscroll-behavior-x: contain;
+  touch-action: pan-y;
+}
