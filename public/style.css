@@ -1,10 +1,10 @@
-/* Ensure grid-wrap is positioned for absolute children */
+/* Container: grid-wrap (position for absolute children; prevent accidental back/forward swipe) */
 #grid-wrap {
   position: relative;
   overscroll-behavior-x: contain;
-  touch-action: pan-y;  
+  touch-action: pan-x pan-y;  
 }
-/* style.css */
+/* Stylesheet */
 
 :root {
   --header-height: 5rem;
@@ -13,7 +13,7 @@
   --compact-row-height: 0.4rem;
   --compact-col-scale: 0.8;
 
-  /* fonts */
+  /* Fonts */
   --font-family-base: 'Roboto Condensed', sans-serif;
   --font-family-date: 'Roboto', sans-serif;
   --font-size-base: 1rem;
@@ -24,7 +24,7 @@
   --font-size-day: 3rem;
   --font-size-date: 1.5rem;
 
-  /* colors */
+  /* Colors */
   --color-white: #fff;
   --color-off-white: #eeedeb;
   --color-grey: #bababa;
@@ -37,7 +37,7 @@
   --color-offair-bg: rgba(240,240,240,1.0);
   --color-border: #000;
 
-  /* textures */
+  /* Textures */
   --texture-paper: url('/textures/newsprint.png');
   --texture-halftone: url('/textures/halftone.png');
   --texture-newspaper: url('/textures/newspaper.png');
@@ -64,7 +64,7 @@ body::after {
   position: absolute;
   top:    0;
   left:   0;
-  /* full-page width for halftone/paper backgrounds */
+  /* Full-page width for halftone/paper backgrounds */
   width: max(100%, calc(4em + var(--chan-count) * var(--chan-width)));
   height: 100%;
   pointer-events: none;
@@ -87,7 +87,7 @@ body::after {
   z-index: 3;
 }
 
-/* ————————— date‐bar ————————— */
+/* Section: date bar */
 .header {
   display: flex;
   align-items: baseline;
@@ -106,7 +106,7 @@ body::after {
   z-index: 20;
 }
 
-/* ————————— header overlays ————————— */
+/* Section: header overlays */
 .header::before,
 .header::after {
   content: "";
@@ -123,9 +123,10 @@ body::after {
   background-blend-mode: multiply, screen;
   opacity: 0.95;
   z-index: 21;
-  /* workaround for iOS Safari multi-background optimization */
+  /* Workaround for iOS Safari multi-background optimization */
   background-attachment: scroll;
   -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   will-change: background-image, opacity;
 }
 
@@ -144,7 +145,27 @@ body::after {
   z-index: 23;
 }
 
-/* ————— guide grid ————— */
+/* Section: header date/day */
+.hdr-day {
+  font-family: var(--font-family-date);
+  font-size: var(--font-size-day);
+  color: var(--color-off-white);
+  padding-top: 0.7rem;
+  padding-left: 0.7rem;
+  position: relative;
+  z-index: 22;
+}
+.hdr-date {
+  font-family: var(--font-family-date);
+  font-size: var(--font-size-date);
+  padding-left: 10px;
+  color: var(--color-grey);
+  padding-top: 0.7rem;
+  position: relative;
+  z-index: 22;
+}
+
+/* Section: guide grid */
 .guide-container {
   display: grid;
   grid-template-columns: 4em repeat(var(--chan-count), minmax(var(--chan-width), 1fr));
@@ -157,7 +178,7 @@ body::after {
   z-index: 0;
 }
 
-/* newspaper overlay, scrolls with the grid */
+/* Overlay: newspaper texture (scrolls with grid) */
 .guide-container::after {
   content: "";
   position: absolute;
@@ -173,7 +194,7 @@ body::after {
   z-index: 20;
 }
 
-/* white out the entire first column so nothing bleeds under it */
+/* Mask: sticky first column */
 .guide-container::before {
   content: "";
   position: absolute;
@@ -187,7 +208,7 @@ body::after {
   border-right: 1px solid var(--color-border);
 }
 
-/* ————— sticky corner ————— */
+/* Section: sticky corner */
 .corner {
   grid-row: 1;
   grid-column: 1;
@@ -199,7 +220,7 @@ body::after {
   z-index: 20;
 }
 
-/* ————— channel headers ————— */
+/* Section: channel headers */
 .channel-header {
   grid-row: 1;
   padding: 0 0.75rem;
@@ -225,7 +246,7 @@ body::after {
   font-weight: normal;
 }
 
-/* ————— time labels ————— */
+/* Section: time labels */
 .time-label {
   grid-column: 1;
   padding: 0.7rem 0.25rem;
@@ -239,7 +260,7 @@ body::after {
   z-index: 5;
 }
 
-/* ————— program blocks ————— */
+/* Section: program blocks */
 .program {
   padding: 0.25rem 0.65rem 0.25rem 0.5rem;
   border-left: 1px solid var(--color-border);
@@ -253,8 +274,6 @@ body::after {
 }
 
 .program.movie {
-  /* background: rgba(255,238,238,0.9); */
-  /* font-style: italic; */
   margin-right: 0.5rem;
   position: relative;
 }
@@ -289,7 +308,7 @@ body::after {
   z-index: 1;
 }
 
-/* ————— OFF-AIR label box ————— */
+/* Section: OFF-AIR label */
 .offair-label {
   position: relative;
   z-index: 2;
@@ -298,7 +317,7 @@ body::after {
   font-size: var(--font-size-summary);
 }
 
-/* ————— summary text ————— */
+/* Section: summary text */
 .summary {
   margin-top: 0.4em;
   font-size: var(--font-size-summary);
@@ -317,40 +336,20 @@ body::after {
   filter: saturate(0.65) brightness(1.2) opacity(0.95) blur(0.2px);
 }
 
-/* ————— header date/day ————— */
-.hdr-day {
-  font-family: var(--font-family-date);
-  font-size: var(--font-size-day);
-  color: var(--color-off-white);
-  padding-top: 0.7rem;
-  padding-left: 0.7rem;
-  position: relative;
-  z-index: 22;
-}
-.hdr-date {
-  font-family: var(--font-family-date);
-  font-size: var(--font-size-date);
-  padding-left: 10px;
-  color: var(--color-grey);
-  padding-top: 0.7rem;
-  position: relative;
-  z-index: 22;
-}
-
-/* ————— TMDB program title links ————— */
-/* remove underline and inherit color */
+/* Section: TMDB program title links */
+/* Style: remove underline and inherit color */
  .program a {
    text-decoration: none;
    color: inherit;
  }
 
-/* ————— highlight current half‐hour slot ————— */
+/* Highlight: current half-hour slot */
 .time-label.current {
   font-weight: bold;
   color: rgb(181, 41, 41);
 }
 
-/* ——— FontAwesome star icons ——— */
+/* Icons: Font Awesome stars */
 .star-wrapper {
     padding-left: 0.5rem;
 }
@@ -371,7 +370,7 @@ body::after {
   color: black;
 }
 
-/* ——— year / rating / stars container ——— */
+/* Container: year, rating, and stars */
 .movie-extras {
   display: inline-flex;
   align-items: baseline;
@@ -382,16 +381,20 @@ body::after {
   font-style: italic;
 }
 
-/* ————— highlight current program titles ————— */
+/* Highlight: current program titles */
 .program-title-wrapper.current-prog {
   position: relative;
 }
-.program-title-wrapper.current-prog::before {
+.program-title {
+  display: inline-block;
+  position: relative;
+}
+.program-title-wrapper.current-prog .program-title::before {
   content: "";
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  left: -20%;
+  right: -20%;
   bottom: 0;
   background-image: var(--highlighter-url);
   background-repeat: no-repeat;
@@ -407,12 +410,8 @@ body::after {
   position: relative;
   z-index: 1;
 }
-.program-title-wrapper.current-prog > * {
-  position: relative;
-  z-index: 1;
-}
 
-/* ————— registration marks ————— */
+/* Decoration: registration marks */
 .registration-marks {
   position: absolute;
   bottom: -0.1rem;
@@ -427,7 +426,7 @@ body::after {
   z-index: 25;
 }
 
-/* ————— compact mode overrides ————— */
+/* Compact mode: overrides */
 body.compact .guide-container {
   grid-template-rows: var(--channel-header-height) repeat(290, var(--compact-row-height));
   grid-template-columns: 4em repeat(var(--chan-count), minmax(calc(var(--chan-width) * var(--compact-col-scale)), 1fr));
@@ -450,32 +449,38 @@ body.compact .program {
   border-bottom: 1px solid rgb(197, 195, 195);
 }
 
-/* ————— compact mode half-hour hiding ————— */
+/* Compact mode: hide half-hour labels */
 body.compact .time-label:nth-of-type(odd) {
   display: none !important;
 }
 
-/* keep paper texture narrow in compact mode */
+/* Compact mode: keep paper texture narrow */
 body.compact::before {
-  width: calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale))) !important;
+  width: max(100%, calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale)))) !important;
 }
-/* let halftone span full page in compact mode */
+/* Compact mode: let halftone span full page */
 body.compact::after {
   width: max(100%, calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale)))) !important;
 }
 
-/* keep newspaper overlay spanning full grid in compact mode */
+/* Compact mode: keep newspaper overlay spanning full grid */
 body.compact .guide-container::after {
   width: max(100%, calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale)))) !important;
 }
 
-/* prevent accidental back/forward swipe during horizontal scroll */
+/* UX: prevent accidental back/forward swipe during horizontal scroll */
 #grid-wrap {
   overscroll-behavior-x: contain;
-  touch-action: pan-y;
+  touch-action: pan-x pan-y;
 }
-/* use fixed rem widths when channels exceed viewport */
+/* Layout: fixed rem widths when channels exceed viewport */
 body.fixed-cols .guide-container {
   grid-template-columns: 4em repeat(var(--chan-count), var(--chan-width)) !important;
   width: calc(4em + var(--chan-count) * var(--chan-width)) !important;
+}
+
+/* Fixed columns: compact mode (scaled widths) */
+body.compact.fixed-cols .guide-container {
+  grid-template-columns: 4em repeat(var(--chan-count), calc(var(--chan-width) * var(--compact-col-scale))) !important;
+  width: calc(4em + var(--chan-count) * calc(var(--chan-width) * var(--compact-col-scale))) !important;
 }

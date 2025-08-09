@@ -1,4 +1,4 @@
-// server.js
+// Server: Express proxy and data enrichment
 import express      from 'express';
 import fetch        from 'node-fetch';
 import pMap         from 'p-map';
@@ -15,11 +15,11 @@ const TMDB_KEY = process.env.TMDB_KEY;
 if (!TV_BASE)  throw new Error('Set FS42_API_URL in .env');
 if (!TMDB_KEY) throw new Error('Set TMDB_KEY in .env');
 
-// In-memory cache: up to 1000 entries, 1-hour TTL
+// Cache: in-memory (up to 1000 entries, 1-hour TTL)
 const tmdbCache = new LRUCache({ max: 1000, ttl: 1000 * 60 * 60 });
 let lastCall = 0;
 
-// 1) Proxy channel list
+// Route 1: Proxy channel list
 app.get('/api/stations', async (req, res) => {
   try {
     const j = await fetch(`${TV_BASE}/summary/stations`).then(r => r.json());
@@ -30,7 +30,7 @@ app.get('/api/stations', async (req, res) => {
   }
 });
 
-// 2) Proxy schedule blocks with TMDb ID enrichment
+// Route 2: Proxy schedule blocks with TMDb ID enrichment
 app.get('/api/schedules/:net', async (req, res) => {
   const net   = encodeURIComponent(req.params.net);
   const { start, end } = req.query;
@@ -59,7 +59,7 @@ app.get('/api/schedules/:net', async (req, res) => {
         }
         return { ...blk, tmdb_id, series_id, starRating: null };
       } else {
-        // Movie?
+        // Movie block
         const mvMatch = raw.match(/^(.*?)\s*\((\d{4})\)\s*$/);
         if (mvMatch) {
           const movieName = mvMatch[1].trim();
@@ -76,7 +76,7 @@ app.get('/api/schedules/:net', async (req, res) => {
               detailsUrl.searchParams.set('api_key', TMDB_KEY);
               const detailsJ = await (await fetch(detailsUrl)).json();
               const starRating = detailsJ.vote_average || 0;
-              // attach rating
+              // Attach rating
               return { ...blk, tmdb_id, series_id, starRating };
             }
           }
@@ -93,7 +93,7 @@ app.get('/api/schedules/:net', async (req, res) => {
   }
 });
 
-// 3) Proxy summary of all stations
+// Route 3: Proxy summary of all stations
 app.get('/api/summary', async (req, res) => {
   try {
     const j = await fetch(`${TV_BASE}/summary`).then(r => r.json());
@@ -104,7 +104,7 @@ app.get('/api/summary', async (req, res) => {
   }
 });
 
-// 4) TMDb summary + certification lookup
+// Route 4: TMDb summary, certification, director, and image lookup
 app.get('/api/tmdb-summary', async (req, res) => {
   const title = (req.query.title || '').trim();
   if (!title) return res.json({ overview: '', certification: '', image: '' });
@@ -112,7 +112,7 @@ app.get('/api/tmdb-summary', async (req, res) => {
     return res.json(tmdbCache.get(title));
   }
 
-  // throttle to 4/sec
+  // Throttle to 4/sec
   const now = Date.now();
   const wait = Math.max(0, 250 - (now - lastCall));
   if (wait) await new Promise(r => setTimeout(r, wait));
@@ -123,7 +123,7 @@ app.get('/api/tmdb-summary', async (req, res) => {
   try {
     const epMatch = title.match(/^(.*?)\s[-–]\s*S(\d+?)E(\d+?)(?:[-–]E\d+)?$/i);
     if (epMatch) {
-      // TV episode
+      // TV episode lookup
       const [, seriesName, seasonStr, episodeStr] = epMatch;
       const season = parseInt(seasonStr, 10), episode = parseInt(episodeStr, 10);
       const searchUrl = new URL('https://api.themoviedb.org/3/search/tv');
@@ -145,7 +145,7 @@ app.get('/api/tmdb-summary', async (req, res) => {
         return res.json(out);
       }
     } else {
-      // Movie
+      // Movie lookup
       const mvMatch   = title.match(/^(.*?)\s*\((\d{4})\)\s*$/);
       const movieName = mvMatch ? mvMatch[1].trim() : title;
       const movieYear = mvMatch ? mvMatch[2] : '';
@@ -191,7 +191,7 @@ app.get('/api/tmdb-summary', async (req, res) => {
   res.json(out);
 });
 
-// 5) Proxy “zap to channel” requests
+// Route 5: Proxy “zap to channel” requests
 app.get('/api/player/channels/:chanNum', async (req, res) => {
   const { chanNum } = req.params;
   try {
@@ -203,7 +203,7 @@ app.get('/api/player/channels/:chanNum', async (req, res) => {
   }
 });
 
-// Inject IGNORE_CHANS into window for client-side use
+// Route: Inject IGNORE_CHANS into window for client-side use
 app.get('/', (req, res) => {
   const indexPath = path.join(process.cwd(), 'public', 'index.html');
   let html = fs.readFileSync(indexPath, 'utf8');
@@ -212,10 +212,10 @@ app.get('/', (req, res) => {
   res.send(html);
 });
 
-// 6) Serve static frontend
+// Static: Serve frontend
 app.use(express.static(path.join(process.cwd(), 'public')));
 
-// Start server
+// Startup
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`📺 TV-guide proxy listening at http://localhost:${PORT}/`);

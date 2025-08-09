@@ -4,18 +4,24 @@ import { useState, useEffect } from 'https://esm.sh/preact@10/hooks';
 import htm from 'https://esm.sh/htm@3';
 const html = htm.bind(h);
 
-// enable compact mode via URL parameter
+// Enable compact mode via URL parameter
 const params = new URLSearchParams(window.location.search);
 if (params.get('mode') === 'compact') {
   document.body.classList.add('compact');
 }
 
-// toggle fixed column widths when viewport is narrower than content
+// Toggle fixed column widths when viewport is narrower than content
 function updateFixedColumns() {
-  const chanCount = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--chan-count'), 10);
-  const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-  const chanWidthRem = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chan-width'));
-  const minTotalPx = (4 + chanCount * chanWidthRem) * rootFontSize;
+  const styles = getComputedStyle(document.documentElement);
+  const chanCount = parseInt(styles.getPropertyValue('--chan-count'), 10);
+  const rootFontSize = parseFloat(styles.fontSize);
+  const chanWidthRem = parseFloat(styles.getPropertyValue('--chan-width'));
+  const compactScale = parseFloat(styles.getPropertyValue('--compact-col-scale')) || 1;
+  const isCompactMode = document.body.classList.contains('compact');
+
+  const effectiveChanWidthRem = isCompactMode ? (chanWidthRem * compactScale) : chanWidthRem;
+  const minTotalPx = (4 + chanCount * effectiveChanWidthRem) * rootFontSize;
+
   if (window.innerWidth < minTotalPx) {
     document.body.classList.add('fixed-cols');
   } else {
@@ -24,16 +30,16 @@ function updateFixedColumns() {
 }
 window.addEventListener('load', updateFixedColumns);
 window.addEventListener('resize', updateFixedColumns);
-// run once on script load to set initial fixed-cols state
+// Run once on script load to set initial fixed-cols state
 updateFixedColumns();
 
-// number of milliseconds in one minute
+// Constants
 const MS_PER_MINUTE = 60 * 1000;
 
 const TV_SLUGIFY = name =>
   name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 
-// load ignored channel names injected by server
+// Load ignored channel names injected by server
 const rawIgnore = window.IGNORE_CHANS || '';
 const IGNORE = new Set(rawIgnore.split(',').map(name => name.trim()).filter(Boolean));
 const TV_EP_RX = /\s[-–]\s*S(\d+)E(\d+)(?:[-–]E\d+)?$/i;
@@ -49,21 +55,21 @@ function App() {
   const displayDate = new Date(currentDate);
   if (currentDate.getHours() < 6) displayDate.setDate(displayDate.getDate() - 1);
 
-  // state
+  // State
   const [chanNumbers, setChanNumbers] = useState(null);
   const [channels, setChannels] = useState([]);
   const [labels, setLabels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentLabelIdx, setCurrentLabelIdx] = useState(null);
 
-  // real-time clock for current program highlighting
+  // Real-time clock for current program highlighting
   const [nowMs, setNowMs] = useState(Date.now());
   useEffect(() => {
     const iv = setInterval(() => setNowMs(Date.now()), MS_PER_MINUTE);
     return () => clearInterval(iv);
   }, []);
 
-  // compute timeline bounds
+  // Compute timeline bounds
   const startDt = new Date(displayDate);
   startDt.setHours(6,0,0,0);
   const endDt = new Date(displayDate);
@@ -76,7 +82,7 @@ function App() {
   const totalMin = (end - start) / MS_PER_MINUTE;
   const totalRows = (totalMin - 60) / slotMin;
 
-  // fetch channel-number map
+  // Fetch channel-number map
   useEffect(() => {
     fetch('/api/summary')
       .then(r => r.json())
@@ -90,7 +96,7 @@ function App() {
       .catch(() => setChanNumbers({}));
   }, []);
 
-  // helper: merge back-to-back OFF-AIR
+  // Helper: merge back-to-back OFF-AIR blocks
   function mergeOffair(blocks) {
     if (!blocks) return [];
     const sorted = blocks.slice().sort((a,b)=>new Date(a.start_time) - new Date(b.start_time));
@@ -112,7 +118,7 @@ function App() {
     return merged;
   }
 
-  // fetch schedules once chan-nums known
+  // Fetch schedules once channel numbers are known
   useEffect(() => {
     if (chanNumbers === null) return;
     fetch('/api/stations')
@@ -144,7 +150,7 @@ function App() {
     shuffled.slice(0, 2).forEach(t => imageEligibleMovies.add(t));
   }, [channels]);
 
-  // build time labels & date header
+  // Build time labels and date header
   useEffect(() => {
     const L = [];
     for (let i = 0; i < totalRows; i++) {
@@ -166,7 +172,7 @@ function App() {
       const now = Date.now();
       const isCompactMode = document.body.classList.contains('compact');
       if (isCompactMode) {
-        // highlight the current hour label
+        // Highlight the current hour label
         const nowDt = new Date(now);
         const hourTxt = nowDt.toTimeString().slice(0,5).replace(/:\d{2}$/, ':00');
         const match = labels.find(l => l.txt === hourTxt);
@@ -178,7 +184,7 @@ function App() {
         setCurrentLabelIdx(labelIdx);
       }
     };
-    updateCurrent(); // initial highlight
+    updateCurrent(); // Initial highlight
     const iv = setInterval(updateCurrent, MS_PER_MINUTE);
     return () => clearInterval(iv);
   }, [start, labels]);
@@ -187,7 +193,7 @@ function App() {
     return html`<div style="padding:1rem;font-style:italic;">Loading…</div>`;
   }
 
-  // set channel count var and compute CSS grid columns
+  // Set channel count variable and compute CSS grid columns
   document.documentElement.style.setProperty('--chan-count', channels.length);
   updateFixedColumns();
   const cols = ['4em', ...channels.map(()=> '1fr')].join(' ');
@@ -196,10 +202,10 @@ function App() {
     <div id="grid-wrap">
       <div class="guide-container" style="grid-template-columns:${cols};">
 
-        <!-- corner -->
+        <!-- Corner -->
         <div class="corner"></div>
 
-        <!-- clickable channel headers -->
+        <!-- Clickable channel headers -->
         ${channels.map((c,i) => {
           const num = chanNumbers[c.net];
           const zap = () => {
@@ -221,7 +227,7 @@ function App() {
           `;
         })}
 
-        <!-- time labels -->
+        <!-- Time labels -->
         ${labels.map(({idx, txt}) => {
           const minutes = parseInt(txt.split(':')[1], 10);
           const isCompactMode = document.body.classList.contains('compact');
@@ -234,7 +240,7 @@ function App() {
           `;
         })}
 
-        <!-- program blocks -->
+        <!-- Program blocks -->
         ${channels.flatMap((c,ci) =>
           c.blocks.filter(b=>new Date(b.start_time).getTime()<end)
                    .map(b=>{
@@ -248,15 +254,15 @@ function App() {
             const charLimit = Math.floor(span*totalMin/70);
             const disp = raw.replace(TV_EP_RX,'').trim();
 
-            // extract episode and series info for link
+            // Extract episode and series info for link
             const epMatch = raw.match(/[-–]\s*S(\d+)E(\d+)/i);
             const season  = epMatch ? parseInt(epMatch[1], 10) : null;
             const episode = epMatch ? parseInt(epMatch[2], 10) : null;
 
-            // extract IDs directly from block
+            // Extract IDs directly from block
             const { tmdb_id: tmdbId, series_id: seriesId } = b;
 
-            // compute display title and year span
+            // Compute display title and year span
             const baseTitle = disp.replace(/\s*\((\d{4})\)$/, '').trim();
             const yearMatch = raw.match(/\((\d{4})\)$/);
             const titleNode = html`
@@ -264,17 +270,17 @@ function App() {
               <${Rating} title=${raw}/>
             `;
 
-            // determine if this block is currently airing
+            // Determine if this block is currently airing
             const startMs = new Date(b.start_time).getTime();
             const endMsBlock = Math.min(new Date(b.end_time).getTime(), end);
             const isCurrentProgram = nowMs >= startMs && nowMs < endMsBlock;
-            // pick a random highlighter and random transform
+            // Pick a random highlighter and random transform
             const highlighterUrl = `/textures/highlighter-${Math.floor(Math.random()*4)+1}.png`;
-            const rotateDeg = Math.random() * 4 - 2;  // random rotation between -2° and +2°
-            const flipType = Math.random() < 0.5 ? 'X' : 'Y';  // randomly choose horizontal or vertical flip
+            const rotateDeg = Math.random() * 4 - 2;  // Random rotation between -2° and +2°
+            const flipType = Math.random() < 0.5 ? 'X' : 'Y';  // Randomly choose horizontal or vertical flip
             const highlighterTransform = `rotate(${rotateDeg}deg) scale${flipType}(-1)`;
 
-            // build href
+            // Build href
             let href = null;
             if (!isOff) {
               if (epMatch && seriesId) {
@@ -284,8 +290,7 @@ function App() {
               }
             }
 
-            // render title wrapper (always plain, never link)
-            // REMOVE rendering of titleElem
+            // Render title wrapper (always plain, never link)
             return html`
               <div class="program${isMovie?' movie':''}${isOff?' offair':''}"
                    style="grid-column:${ci+2}; grid-row:${row}/span ${span};">
@@ -312,7 +317,7 @@ function App() {
   `;
 }
 
-// rating component
+// Rating component
 function Rating({ title }) {
   const [cert, setCert] = useState('');
   useEffect(() => {
@@ -325,7 +330,7 @@ function Rating({ title }) {
   return cert ? html`<span class="rating">(${cert})</span>` : null;
 }
 
-// summary component with hover tooltip and images
+// Summary component with hover tooltip and images
 function Summary({ title, limit, href, starRating, currentProg, highlighterUrl, highlighterTransform }) {
   const isValid = TV_EP_RX.test(title) || MOVIE_YR_RX.test(title);
 
@@ -375,7 +380,7 @@ function Summary({ title, limit, href, starRating, currentProg, highlighterUrl, 
   const showDescription = full && full.length > 0;
   const disp = showDescription ? (full.length > limit ? full.slice(0,limit)+'…' : full) : null;
 
-  // build display title and year match for title node
+  // Build display title and year match for title node
   const isMovie = MOVIE_YR_RX.test(title);
   const dispTitle = (isMovie ? 'MOVIE: ' : '') + title
     .replace(TV_EP_RX, '')
@@ -398,10 +403,8 @@ function Summary({ title, limit, href, starRating, currentProg, highlighterUrl, 
     `;
   }
 
-  // build title node
-  const titleNode = html`
-    ${dispTitle}
-  `;
+  // Build title node
+  const titleNode = html`<span class="program-title">${dispTitle}</span>`;
 
   if (!showDescription) {
     // Corrected HTM template syntax for program-title-wrapper
@@ -424,7 +427,7 @@ function Summary({ title, limit, href, starRating, currentProg, highlighterUrl, 
     </div>
   `;
 
-  // insert the extras line after summaryContent with updated format
+  // Insert the extras line after summaryContent with updated format
   const extrasLine = isMovie && cert
     ? html`
         <div class="movie-extras">
