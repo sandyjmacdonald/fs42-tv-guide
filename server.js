@@ -41,7 +41,7 @@ app.get('/api/schedules/:net', async (req, res) => {
 
     // Enrich each block with tmdb_id (movies) or series_id (TV)
     const enriched = await pMap(blocks, async blk => {
-      let raw = blk.title.trim();
+      let raw = (blk.content?.title || blk.title || '').trim();
       const cutMatch = raw.match(/^(.*S\d{2}E\d{2})/i);
       if (cutMatch) raw = cutMatch[1];
       let tmdb_id = null, series_id = null;

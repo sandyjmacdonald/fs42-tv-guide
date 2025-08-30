@@ -10,6 +10,10 @@ if (params.get('mode') === 'compact') {
   document.body.classList.add('compact');
 }
 
+// Lightweight debug helper toggled via ?debug
+const DEBUG = params.has('debug') || Boolean(window.DEBUG);
+const dlog = (...args) => { if (DEBUG) console.debug('[TVG]', ...args); };
+
 // Toggle fixed column widths when viewport is narrower than content
 function updateFixedColumns() {
   const styles = getComputedStyle(document.documentElement);
@@ -82,6 +86,10 @@ function App() {
   const totalMin = (end - start) / MS_PER_MINUTE;
   const totalRows = (totalMin - 60) / slotMin;
 
+  // Morning window for targeted debug (06:00–12:00 of displayDate)
+  const morningStartMs = start;
+  const morningEndMs = new Date(new Date(displayDate).setHours(12,0,0,0)).getTime();
+
   // Fetch channel-number map
   useEffect(() => {
     fetch('/api/summary')
@@ -118,9 +126,23 @@ function App() {
     return merged;
   }
 
+  // Helper: format a Date in local time as YYYY-MM-DDTHH:mm:ss (no timezone)
+  const fmtLocal = (dt) => {
+    const pad = (n) => String(n).padStart(2, '0');
+    const y = dt.getFullYear();
+    const m = pad(dt.getMonth()+1);
+    const d = pad(dt.getDate());
+    const H = pad(dt.getHours());
+    const M = pad(dt.getMinutes());
+    const S = pad(dt.getSeconds());
+    return `${y}-${m}-${d}T${H}:${M}:${S}`;
+  };
+
   // Fetch schedules once channel numbers are known
   useEffect(() => {
     if (chanNumbers === null) return;
+    const startLocal = fmtLocal(new Date(start));
+    const endLocal   = fmtLocal(new Date(end));
     fetch('/api/stations')
       .then(r => r.json())
       .then(list => {
@@ -129,15 +151,38 @@ function App() {
           nets.map(net =>
             fetch(
               `/api/schedules/${encodeURIComponent(net)}` +
-              `?start=${new Date(start).toISOString()}` +
-              `&end=${new Date(end).toISOString()}`
+              `?start=${encodeURIComponent(startLocal)}` +
+              `&end=${encodeURIComponent(endLocal)}`
             )
             .then(r => r.json())
             .then(blocks => ({ net, blocks: mergeOffair(blocks) }))
           )
         );
       })
-      .then(data => { setChannels(data); setLoading(false); })
+      .then(data => {
+        // Single consolidated debug: log program block data used for rendering
+        if (DEBUG) {
+          try {
+            console.groupCollapsed('[TVG] Program blocks');
+            data.forEach(({ net, blocks }) => {
+              const simplified = blocks.map(b => ({
+                title: b.title,
+                contentTitle: b.content?.title || null,
+                start: b.start_time,
+                end: b.end_time,
+                tmdb_id: b.tmdb_id ?? null,
+                series_id: b.series_id ?? null,
+                starRating: b.starRating ?? null,
+              }));
+              console.debug(`[TVG] ${net}`, simplified);
+            });
+          } finally {
+            console.groupEnd();
+          }
+        }
+        setChannels(data);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, [chanNumbers]);
 
@@ -248,9 +293,9 @@ function App() {
             const dOff = (Math.min(new Date(b.end_time), endDt)-new Date(b.start_time))/60000;
             const row  = Math.round(sOff/slotMin)+2;
             const span = Math.max(1, Math.round(dOff/slotMin));
-            const raw  = b.title.trim();
+            const raw  = ((b.content && b.content.title) ? b.content.title : b.title || '').trim();
             const isMovie = MOVIE_YR_RX.test(raw);
-            const isOff   = OFFAIR_RX.test(raw);
+            const isOff   = OFFAIR_RX.test((b.title||'').trim()) || OFFAIR_RX.test(raw);
             const charLimit = Math.floor(span*totalMin/70);
             const disp = raw.replace(TV_EP_RX,'').trim();
 
