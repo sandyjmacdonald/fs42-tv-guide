@@ -296,7 +296,7 @@ function App() {
             const raw  = ((b.content && b.content.title) ? b.content.title : b.title || '').trim();
             const isMovie = MOVIE_YR_RX.test(raw);
             const isOff   = OFFAIR_RX.test((b.title||'').trim()) || OFFAIR_RX.test(raw);
-            const charLimit = Math.floor(span*totalMin/70);
+            const charLimit = Math.floor(span*totalMin/80);
             const disp = raw.replace(TV_EP_RX,'').trim();
 
             // Extract episode and series info for link
