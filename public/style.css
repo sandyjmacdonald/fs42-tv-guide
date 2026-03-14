@@ -201,7 +201,7 @@ body::after {
   bottom:   0;
   left:     0;
   width:    4em;
-  height: 287rem;
+  height: 288rem;
   position: sticky;
   background: var(--color-white);
   z-index: 5;
@@ -420,10 +420,9 @@ body::after {
   height: 2.5rem;
   background: var(--registration-url) no-repeat center center;
   background-size: contain;
-  mix-blend-mode: overlay;
-  opacity: 0.75;
+  opacity: 0.6;
   pointer-events: none;
-  z-index: 25;
+  z-index: 500;
 }
 
 /* Compact mode: overrides */
