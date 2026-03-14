@@ -201,7 +201,7 @@ body::after {
   bottom:   0;
   left:     0;
   width:    4em;
-  height: 288rem;
+  height: 289rem;
   position: sticky;
   background: var(--color-white);
   z-index: 5;
@@ -433,7 +433,7 @@ body.compact .guide-container {
 }
 
 body.compact .guide-container::before {
-  height: calc(287 * var(--compact-row-height));
+  height: calc(289 * var(--compact-row-height));
 }
 
 body.compact .program .summary,
